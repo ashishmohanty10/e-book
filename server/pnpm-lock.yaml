@@ -17,6 +17,9 @@ importers:
       express:
         specifier: ^4.21.1
         version: 4.21.1
+      http-errors:
+        specifier: ^2.0.0
+        version: 2.0.0
     devDependencies:
       '@eslint/js':
         specifier: ^9.15.0
@@ -24,6 +27,9 @@ importers:
       '@types/express':
         specifier: ^5.0.0
         version: 5.0.0
+      '@types/http-errors':
+        specifier: ^2.0.4
+        version: 2.0.4
       '@types/node':
         specifier: ^22.9.0
         version: 22.9.0
