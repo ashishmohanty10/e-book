@@ -1,6 +1,9 @@
 import { NextFunction, Request, Response } from 'express'
 import createHttpError from 'http-errors'
 import prisma from '../config/db'
+import bcrypt from 'bcryptjs'
+import { sign } from 'jsonwebtoken'
+import { config } from '../config/config'
 
 export const createUser = async (
     req: Request,
@@ -27,20 +30,26 @@ export const createUser = async (
 
             return next(error)
         } else {
+            const hashedPassword = await bcrypt.hash(password, 10)
+
             const newUser = await prisma.user.create({
                 data: {
                     email,
                     firstname,
                     lastname,
-                    password,
+                    password: hashedPassword,
                 },
             })
 
-            return newUser
-        }
-    } catch (error) {}
+            const token = sign(
+                { sub: newUser.id },
+                config.jwtSecret as string,
+                { expiresIn: '7d' }
+            )
 
-    res.json({
-        message: 'User created successfully',
-    })
+            res.json({ accesToken: token })
+        }
+    } catch (error) {
+        console.log('error', error)
+    }
 }
