@@ -47,8 +47,45 @@ export const createUser = async (
                 { expiresIn: '7d' }
             )
 
-            res.json({ accesToken: token })
+            res.status(201).json({ accesToken: token })
         }
+    } catch (error) {
+        console.log('error', error)
+    }
+}
+
+export const loginUser = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+) => {
+    const { email, password } = req.body
+
+    if (!email || !password) {
+        const error = createHttpError(400, 'All fields are required')
+
+        return next(error)
+    }
+
+    try {
+        const user = await prisma.user.findUnique({
+            where: {
+                email,
+            },
+        })
+        if (!user) {
+            return next(createHttpError(404, 'User not found'))
+        }
+
+        const isMatch = await bcrypt.compare(password, user.password)
+        if (!isMatch) {
+            return next(createHttpError(401, 'Usernam or password incorrect'))
+        }
+
+        const token = sign({ sub: user.id }, config.jwtSecret as string, {
+            expiresIn: '7d',
+        })
+        res.json({ accessToken: token })
     } catch (error) {
         console.log('error', error)
     }
