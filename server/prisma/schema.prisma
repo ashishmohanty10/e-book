@@ -21,6 +21,23 @@ model User {
   email     String @unique
   password  String
 
+  book Book[]
+
   createdAt DateTime @default(now())
   updateAt  DateTime @updatedAt
+}
+
+model Book {
+  id String @id @default(cuid())
+
+  title      String
+  author     String
+  genre      String
+  file       String
+  coverImage String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  User      User?    @relation(fields: [userId], references: [id])
+  userId    String?
 }
